@@ -1,7 +1,6 @@
-// https://github.com/dionyziz/stream.js/blob/master/stream.js
+// See: https://github.com/dionyziz/stream.js/blob/master/stream.js
 
 #include <functional>
-// #include <memory>
 
 template <class T>
 class Stream
@@ -27,6 +26,10 @@ public:
 	{
 		return headValue_ == nullptr;
 	}
+	bool avail()
+	{
+		return headValue_ != nullptr;
+	}
 	T* head()
 	{
 		return headValue_;
@@ -35,9 +38,9 @@ public:
 	{
 		if (empty())
 			throw "Cannot get tail of empty stream.";
-		return tailPromise_();
+		return tailPromise_(); // TODO: remember the result, set function to nullptr
 	}
-	// length, add, append, zip, map
+	// TODO: length, add, append, zip, map
 	Stream<T>* filter(std::function<bool(T)> f)
 	{
 		if (empty())
@@ -65,6 +68,13 @@ public:
 		return new Stream<U>(i, [this, f] () -> Stream<U>* {
 			return this->tail()->map(f);
 		});
+	}
+	void walk(std::function<void(T)> f) {
+		Stream<T>* s = this;
+		while(s->avail()) {
+			f(*s->head());
+			s = s->tail();
+		}
 	}
 	static Stream<int>* makeOnes() {
 		int* i = new int(1);
