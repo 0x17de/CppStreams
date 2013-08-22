@@ -5,7 +5,7 @@
 using namespace std;
 
 int main() {
-	auto s = Stream_makeOnes()->take(5);
+	auto s = Stream<int>::range(10, 30)->take(5);
 	while(!s->empty()) {
 		cout << *s->head() << endl;
 		s = s->tail();

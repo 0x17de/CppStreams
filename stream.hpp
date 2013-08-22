@@ -1,22 +1,24 @@
 #include <functional>
-#include <memory>
+// #include <memory>
 
 template <class T>
 class Stream
 {
 private:
-	typedef (Stream<T>*)(*fTail)();
+	typedef Stream<T>* (*fTail)();
 	T* headValue_;
-	fTail tailPromise_;
+	std::function<Stream<T>*()> tailPromise_;
 
 public:
-	Stream(T* headValue = nullptr, fTail tailPromise = nullptr)
+	Stream(T* headValue = nullptr, std::function<Stream<T>*()> tailPromise = nullptr)
 	{
 		headValue_ = headValue;
 		if (tailPromise != nullptr) {
 			tailPromise_ = tailPromise;
 		} else {
-			tailPromise_ = []{ return new Stream<T>(); };
+			tailPromise_ = [] () -> Stream<T>* {
+				return new Stream<T>();
+			};
 		}
 	}
 	bool empty()
@@ -49,15 +51,20 @@ public:
 	{
 		if (empty() || number == 0)
 			return new Stream<T>();
-		return new Stream<T>(head(), [this, number] {
+		return new Stream<T>(head(), [this, number] () -> Stream<T>* {
 			return this->tail()->take(number - 1);
 		});
 	}
+	static Stream<int>* makeOnes() {
+		int* i = new int(1);
+		return new Stream<int>(i, [] () -> Stream<int>* {
+			return Stream<int>::makeOnes();
+		});
+	}
+	static Stream<int>* range(int low, int high) {
+		int* i = new int(low);
+		return new Stream<int>(i, [low, high] () -> Stream<int>* {
+			return Stream<int>::range(low + 1, high);
+		});
+	}
 };
-
-Stream<int>* Stream_makeOnes() {
-	int i = 1;
-	return new Stream<int>(&i, [Stream] (int) {
-		return Stream_makeOnes();
-	});
-}
