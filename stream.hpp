@@ -5,11 +5,12 @@ template <class T>
 class Stream
 {
 private:
+	typedef (Stream<T>*)(*fTail)();
 	T* headValue_;
-	std::function<Stream<T>*()> tailPromise_;
+	fTail tailPromise_;
 
 public:
-	Stream(T* headValue = nullptr, std::function<Stream<T>*()> tailPromise = nullptr)
+	Stream(T* headValue = nullptr, fTail tailPromise = nullptr)
 	{
 		headValue_ = headValue;
 		if (tailPromise != nullptr) {
