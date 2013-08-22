@@ -1,3 +1,5 @@
+// https://github.com/dionyziz/stream.js/blob/master/stream.js
+
 #include <functional>
 // #include <memory>
 
@@ -41,11 +43,11 @@ public:
 		if (empty())
 			return new Stream<T>();
 		auto headValue = head();
-		if (f(headValue))
-			return new Stream<T>(headValue, [&tailPromise_,&f] {
-				return tailPromise_.filter(f);
+		if (f(*headValue))
+			return new Stream<T>(headValue, [this,f] {
+				return this->tail()->filter(f);
 			});
-		return tailPromise_.filter(f);	
+		return this->tail()->filter(f);	
 	}
 	Stream<T>* take(int number)
 	{
@@ -53,6 +55,15 @@ public:
 			return new Stream<T>();
 		return new Stream<T>(head(), [this, number] () -> Stream<T>* {
 			return this->tail()->take(number - 1);
+		});
+	}
+	template <class U>
+	Stream<U>* map(std::function<U(T)> f) {
+		if (empty())
+			return new Stream<U>();
+		float* i = new float(f(*head()));
+		return new Stream<U>(i, [this, f] () -> Stream<U>* {
+			return this->tail()->map(f);
 		});
 	}
 	static Stream<int>* makeOnes() {
