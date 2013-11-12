@@ -1,7 +1,9 @@
 CppStreams
 ==========
 
-Streams like from streamjs.org in C++
+Streams like from streamjs.org in C++.
+
+View *stream.cpp* for an example.
 
 
 Special Thanks
