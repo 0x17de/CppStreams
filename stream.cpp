@@ -1,15 +1,23 @@
 #include <iostream>
+
 #include "stream.hpp"
 
 using namespace std;
 
-int main() {
-	Stream<int>::range(10, 100)
-	->take(20)
-	->filter([](int a) { return a % 2 == 0; })
-	->map<float>([](int a) { return a + 0.5f; })
-	->walk([](float a) {
-		cout << a << endl;
-	});
-	return 0;
+int main()
+{
+    Stream<int>::range(5)
+    .filter([] (int num)
+    {
+        return num % 2 == 0;
+    })
+    .take(5)
+    .map<float>([] (int num)
+    {
+         return (float)num + 0.5f;
+    })
+    .walk([] (float num)
+    {
+        cout << num << endl;
+    });
 }
